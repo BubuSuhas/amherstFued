@@ -361,3 +361,37 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
   cursor: pointer;
 }
 .audio-enable:hover { filter: brightness(1.05); }
+
+/* Fullscreen audio unlock overlay */
+.audio-unlock {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 12, 28, 0.82);
+  backdrop-filter: blur(1px);
+  z-index: 2000;
+  color: #fff;
+  text-align: center;
+}
+.audio-unlock-box {
+  padding: 1.2rem 1.6rem;
+  background: linear-gradient(180deg, #1d4aa8, #0f1526);
+  border: 3px solid #ffd84d;
+  border-radius: 12px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.45), inset 0 0 0 2px #08227b;
+}
+.audio-unlock-title { font-weight: 900; font-size: 1.6rem; margin-bottom: 0.3rem; }
+.audio-unlock-hint { opacity: 0.9; font-size: 1rem; margin-bottom: 0.8rem; }
+.audio-unlock-btn {
+  padding: 0.6rem 1.1rem;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #0a1a3a;
+  background: #ffd84d;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.audio-unlock-btn:hover { filter: brightness(1.06); }

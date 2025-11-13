@@ -518,7 +518,11 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   private playFastMoneyTheme() {
     try {
       if (this.sfx['fast'] && this.sfxReady['fast']) {
-        this.playOneShot(this.sfx['fast']);
+        // Use the preloaded element to improve reliability post-unlock
+        const el = this.sfx['fast'];
+        try { el.pause(); } catch {}
+        try { el.currentTime = 0; } catch {}
+        el.play().catch(() => {});
       } else {
         // Fallback: play the board load sound if theme not ready
         this.playBoardLoadSound();
