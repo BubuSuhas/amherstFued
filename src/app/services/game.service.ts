@@ -147,7 +147,10 @@ export class GameService {
         const sameOrigin = `${proto}://${loc.host}`;
         const local3001 = `${proto}://localhost:3001`;
         const localLoop = `${proto}://127.0.0.1:3001`;
-        return Array.from(new Set([sameOrigin, local3001, localLoop]));
+        // Prefer 3001 first when running via ng serve on 4200
+        const isDev4200 = String((loc as any).port || '').trim() === '4200';
+        const list = isDev4200 ? [local3001, sameOrigin, localLoop] : [sameOrigin, local3001, localLoop];
+        return Array.from(new Set(list));
       } catch {
         return ['ws://localhost:3001'];
       }
@@ -174,10 +177,10 @@ export class GameService {
         ws.onopen = () => {
           opened = true;
           clearTimeout(connectTimeout);
-          console.log('WebSocket connected', url);
+          try { console.log('[ws] connected', url); } catch {}
         };
         ws.onerror = (err) => {
-          console.warn('WebSocket error', err);
+          try { console.warn('[ws] error', err); } catch {}
         };
         ws.onclose = () => {
           clearTimeout(connectTimeout);
@@ -185,13 +188,13 @@ export class GameService {
             // Try next endpoint if this one never opened
             attempt(i + 1);
           } else {
-            console.warn('WebSocket closed, reconnecting in 2s...');
+            try { console.warn('[ws] closed, reconnecting in 2s...'); } catch {}
             setTimeout(() => this.connectWebSocket(), 2000);
           }
         };
         ws.onmessage = (event) => this.handleWebSocketMessage(event as any);
       } catch (e) {
-        console.warn('WebSocket connect failed, trying next', e);
+        try { console.warn('[ws] connect failed, trying next', e); } catch {}
         attempt(i + 1);
       }
     };
@@ -602,6 +605,7 @@ export class GameService {
         break;
       case 'event':
         if (msg.event === 'fastMoney') {
+          try { console.info('[ws] event fastMoney'); } catch {}
           try { (this as any)._onFastMoney?.(); } catch {}
         }
         break;
