@@ -1,0 +1,95 @@
+
+
+<div class="stage">
+  <div class="frame">
+    <div class="arch">
+      <div class="dots"></div>
+    </div>
+    <div class="side-panel left">
+      <div class="feud-team-score-panel">
+        <span>{{ game.selectedTeam }}: {{ selectedTeamScore }}</span>
+        <span class="feud-team-wrong-x">{{ 'X'.repeat(game.wrongCount) }}</span>
+      </div>
+    </div>
+  <div class="board" [class.rapid]="game.isRapidRound">
+      <div class="inner-gold"></div>
+      <div class="bezel">
+        <!-- Question text banner -->
+        <div class="question-banner" *ngIf="game.questionVisible">
+          {{ game.currentQuestion?.text }}
+        </div>
+        <!-- Normal rounds: classic 8/5 slots -->
+        <ng-container *ngIf="!game.isRapidRound; else rapidRound">
+          <div class="slots" [class.show-numbers]="game.showNumbers">
+            <div *ngFor="let slot of [0,1,2,3,4,5,6,7]; let idx = index" class="slot" [class.revealed]="game.currentQuestion.options[idx]?.revealed">
+              <div class="slot-inner">
+                <!-- Front face: number badge -->
+                <div class="slot-face front">
+                  <span
+                    class="slot-number"
+                    *ngIf="game.showNumbers && idx < numAnswersToShow"
+                    [style.animationDelay.ms]="idx * 250"
+                  >{{ idx + 1 }}</span>
+                </div>
+                <!-- Back face: revealed content -->
+                <div class="slot-face back">
+                  <div class="slot-content">
+                    <span class="slot-answer" autoFitText>{{ game.currentQuestion.options[idx]?.answer }}</span>
+                    <span class="slot-percentage">{{ game.currentQuestion.options[idx]?.percentage }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="midbar"></div>
+        </ng-container>
+
+        <!-- Rapid Fire layout -->
+        <ng-template #rapidRound>
+          <div class="rapid-board two-columns">
+            <!-- Participant 1 column -->
+            <div class="rapid-column">
+              <div class="slot" *ngFor="let i of [0,1,2,3,4,5,6,7,8,9]">
+                <div class="slot-content">
+                  <span class="slot-answer" *ngIf="game.rapidAnswers.participant1[i]?.answer" autoFitText>
+                    {{ game.rapidAnswers.participant1[i]?.answer }}
+                  </span>
+                  <span class="slot-percentage" *ngIf="showRapidPercentage('p1', i)">
+                    {{ game.rapidAnswers.participant1[i]?.percentage }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- Participant 2 column (blank until P2 loads) -->
+            <div class="rapid-column">
+              <div class="slot" *ngFor="let i of [0,1,2,3,4,5,6,7,8,9]">
+                <div class="slot-content">
+                  <span class="slot-answer" *ngIf="game.rapidAnswers.participant2[i]?.answer" autoFitText>
+                    {{ game.rapidAnswers.participant2[i]?.answer }}
+                  </span>
+                  <span class="slot-percentage" *ngIf="showRapidPercentage('p2', i)">
+                    {{ game.rapidAnswers.participant2[i]?.percentage }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="score"><div class="digit">{{ game.isRapidRound ? game.totalRapidScore : getTotalScore() }}</div></div>
+      </div>
+    </div>
+    <div class="side-panel right">
+      <ng-container *ngIf="game.timerRunning || (game.timerValue > 0)">
+        <div class="feud-timer-panel">{{ game.timerValue }}s</div>
+      </ng-container>
+    </div>
+    <!-- Audio is initialized automatically; no enable button needed -->
+    <!-- Wrong answer overlay -->
+    <div class="wrong-overlay" [class.visible]="game.showWrong">
+      <div class="wrong-x-group">
+        <div class="wrong-x-symbol">{{ wrongXs }}</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+app = "familyfeud-app"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3001"
+
+[[services]]
+  internal_port = 3001
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 100
+    soft_limit = 50
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.http_checks]
+    interval = 10000
+    timeout = 2000
+    method = "get"
+    path = "/api/ping"

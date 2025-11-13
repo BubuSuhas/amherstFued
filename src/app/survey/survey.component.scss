@@ -1,0 +1,13 @@
+.survey-wrap { display: grid; place-items: center; min-height: 100vh; padding: 2rem; color: #fff; }
+.card { width: min(620px, 92vw); background: #0e1424; border: 2px solid #2a3347; border-radius: 12px; padding: 1.2rem 1.4rem; box-shadow: 0 8px 32px rgba(0,0,0,.45); }
+.qtext { font-weight: 800; font-size: 1.2rem; margin-bottom: .75rem; }
+.qtext.inactive { opacity: .7; }
+.note { font-size: .9rem; color: #bcd3ff; margin-bottom: .9rem; }
+form { display: flex; gap: .6rem; }
+input[type="text"] { flex: 1; padding: .6rem .8rem; border-radius: 8px; border: 1px solid #3a4560; background: #0b1120; color: #fff; }
+button { padding: .6rem .9rem; border-radius: 8px; background: #1d4aa8; border: 1px solid #fff; color: #fff; font-weight: 700; }
+.thanks { color: #93ffb3; font-weight: 700; }
+.meta { margin-top: .8rem; font-size: .9rem; color: #bcd3ff; }
+.debug { margin-top: .8rem; font-size: .9rem; color: #bcd3ff; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.debug .refresh { padding: .2rem .5rem; border-radius: 6px; background: #1d4aa8; border: 1px solid #fff; color: #fff; }
+.debug-small { margin-top: .4rem; font-size: .8rem; color: #8ea7d9; word-break: break-word; }

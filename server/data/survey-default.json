@@ -1,0 +1,177 @@
+{
+  "sessionId": "default",
+  "active": true,
+  "currentQuestionIndex": 0,
+  "currentQuestionText": "Name a common Indian superstition.",
+  "responses": [
+    {
+      "id": "1761835611858-5xbc0g",
+      "ts": 1761835611858,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "raw": "black cat on the way"
+    },
+    {
+      "id": "1761836457592-9gq9y0",
+      "ts": 1761836457592,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "black cat on the way"
+    },
+    {
+      "id": "1761836511268-o7saz5",
+      "ts": 1761836511268,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 1,
+      "questionText": "Name something Indian moms do when guests are coming.",
+      "sessionId": "default",
+      "raw": "clean"
+    },
+    {
+      "id": "1761836611050-ck5ph3",
+      "ts": 1761836611050,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "song"
+    },
+    {
+      "id": "1761837445953-a8eh1v",
+      "ts": 1761837445954,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "music"
+    },
+    {
+      "id": "1761837455071-st9wzk",
+      "ts": 1761837455071,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "dance"
+    },
+    {
+      "id": "1761837469143-ff2tk0",
+      "ts": 1761837469143,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "how are you"
+    },
+    {
+      "id": "1761837483002-zl0ayi",
+      "ts": 1761837483002,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "whats up?"
+    },
+    {
+      "id": "1761837495260-e4vk8a",
+      "ts": 1761837495260,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "ate?"
+    },
+    {
+      "id": "1761837508540-som8vd",
+      "ts": 1761837508540,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "had food?"
+    },
+    {
+      "id": "1761837521757-2axxzm",
+      "ts": 1761837521757,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 2,
+      "questionText": "Name something you hear at Indian weddings/gatherings",
+      "sessionId": "default",
+      "raw": "food?"
+    },
+    {
+      "id": "1761838794784-0xsiyu",
+      "ts": 1761838794784,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "cat of street"
+    },
+    {
+      "id": "1761838806383-ei868r",
+      "ts": 1761838806383,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "cat on the road"
+    },
+    {
+      "id": "1761838820263-ng8x7s",
+      "ts": 1761838820263,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "cat crossing"
+    },
+    {
+      "id": "1761838834292-417un4",
+      "ts": 1761838834292,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "nails cutting"
+    },
+    {
+      "id": "1761838855853-enexau",
+      "ts": 1761838855853,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "dont cut nails in evening"
+    },
+    {
+      "id": "1761838983922-fbntsr",
+      "ts": 1761838983922,
+      "ip": "::1",
+      "clientId": "1761835611856-pj9bwq",
+      "questionIndex": 0,
+      "questionText": "Name a common Indian superstition.",
+      "sessionId": "default",
+      "raw": "dont clean in evening"
+    }
+  ],
+  "synonyms": {}
+}

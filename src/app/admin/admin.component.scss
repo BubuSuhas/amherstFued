@@ -1,0 +1,220 @@
+.admin-dashboard {
+  padding: 1rem 1.25rem;
+  background: #f8f8f8;
+  border-radius: 8px;
+  width: 100%;
+  max-width: none;
+  min-width: 320px;
+  min-height: 0;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+.admin-dashboard h2 {
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+.admin-dashboard button {
+  margin: 0 0.25rem;
+  padding: 0.35rem 0.6rem;
+  line-height: 1.1;
+  font-size: 0.92rem;
+}
+/* Add vertical spacing between all direct children */
+.admin-dashboard > * {
+  margin-bottom: 0.6rem;
+}
+/* Labels */
+.label {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: #666;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+}
+
+/* Toolbar for normal rounds */
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 0.75rem;
+  align-items: end;
+}
+.toolbar-item .question-row,
+.toolbar-item .timer-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.question-text {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.question-text.dimmed { opacity: 0.6; }
+
+input[type="number"],
+input[type="text"],
+select {
+  padding: 0.3rem 0.45rem;
+  font-size: 0.95rem;
+}
+
+/* Options compact grid */
+.options-table {
+  display: grid;
+  grid-template-columns: 3rem 1fr 4rem 7rem;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+}
+.options-table .header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #666;
+  padding: 0.25rem 0;
+}
+.options-table .cell {
+  padding: 0.35rem 0.35rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.options-table .cell.answer.revealed {
+  background: #e8f2ff;
+  border-color: #90caf9;
+}
+.options-table .cell.idx { text-align: center; font-weight: 600; }
+.options-table .cell.pct { text-align: center; font-variant-numeric: tabular-nums; }
+.options-table .cell.action { text-align: center; }
+
+/* Controls grid */
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+.controls-grid .group .row,
+.team-row,
+.nav-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.count { font-weight: 600; }
+
+.scores-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+.score-tag {
+  background: #f2f2f2;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 0.2rem 0.5rem;
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.danger {
+  background: #e53935;
+  color: #fff;
+}
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.option-card {
+  background: #eee;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: background 0.3s, opacity 0.3s;
+}
+.option-card.revealed {
+  background: #1976d2;
+  color: #fff;
+  opacity: 1;
+}
+.option-number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-right: 1rem;
+  width: 2rem;
+  text-align: center;
+}
+.option-flip {
+  flex: 1;
+  font-size: 1.1rem;
+  text-align: center;
+}
+button {
+  margin-left: 1rem;
+}
+.rapid-admin-section {
+  margin-top: 2rem;
+  width: 100%;
+  min-height: 400px;
+}
+.rapid-fire-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+.rapid-fire-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.rapid-fire-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.92rem;
+  table-layout: fixed;
+}
+.rapid-fire-table th, .rapid-fire-table td {
+  border: 1px solid #ccc;
+  padding: 0.3rem 0.5rem;
+  text-align: center;
+  word-break: break-word;
+}
+.rapid-fire-table th {
+  background: #e3e3e3;
+  font-weight: bold;
+}
+.rapid-fire-question-text {
+  font-weight: bold;
+  min-width: 180px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+.rapid-fire-inputs {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rapid-toolbar { display: flex; align-items: center; gap: 0.75rem; }
+.rapid-controls { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
+.rapid-controls .row { display: inline-flex; gap: 0.5rem; align-items: center; }

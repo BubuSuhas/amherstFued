@@ -1,0 +1,211 @@
+
+<div class="admin-dashboard">
+  <h2>Admin Dashboard</h2>
+  <div class="global-audio-controls">
+    <button (click)="playFastMoney()" title="Play Fast Money theme">Play Fast Money</button>
+  </div>
+
+  <!-- Survey Review -->
+  <div class="survey-review">
+    <h3>Survey Review</h3>
+    <div class="ai-status" [class.ok]="aiAvailable" [class.bad]="!aiAvailable">
+      <span *ngIf="aiAvailable">AI available ({{ aiProvider || 'openai' }})</span>
+      <span *ngIf="!aiAvailable">AI unavailable<span *ngIf="aiLastError"> — {{ aiLastError }}</span></span>
+    </div>
+    <div class="row">
+      <label>Question Index:</label>
+      <input type="number" [(ngModel)]="reviewQIndex" min="0" (change)="loadResponsesForReview()" />
+      <button (click)="loadResponsesForReview()">Load</button>
+      <button (click)="exportReviewSheet()" [disabled]="clusters.length===0">Export Sheet</button>
+      <span class="hint">Top answers will be exported to the game sheet format.</span>
+    </div>
+    <div class="row">
+      <label>Synonyms (one per line: from => to)</label>
+    </div>
+    <textarea [(ngModel)]="synonymsText" rows="4" (change)="onSynonymsChangeLocal()"></textarea>
+    <div class="row">
+      <button (click)="aiCluster()" [disabled]="!aiAvailable || !rawResponses.length">AI Cluster</button>
+      <button (click)="saveSynonyms()">Save Synonyms</button>
+      <button (click)="recluster()">Re-cluster</button>
+    </div>
+    <div class="clusters" *ngIf="clusters.length">
+      <div class="cluster" *ngFor="let c of clusters">
+        <div class="cluster-head">
+          <input type="text" [(ngModel)]="c.label" (change)="onLabelChange(c)" />
+          <span class="count">{{ c.count }} ({{ c.percentage }}%)</span>
+          <button (click)="mergeInto(c)">Merge Into</button>
+        </div>
+        <div class="examples">
+          <span *ngFor="let e of c.examples">{{ e }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="!clusters.length">No responses yet for this question.</div>
+  </div>
+  <!-- Normal rounds: compact, well-aligned layout -->
+  <div class="toolbar-grid" *ngIf="game.currentQuestion?.round !== 'Rapid Fire'">
+    <div class="toolbar-item">
+      <span class="label">Import (Excel)</span>
+      <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" />
+    </div>
+    <div class="toolbar-item question">
+      <span class="label">Question</span>
+      <div class="question-row">
+        <span class="question-text" [class.dimmed]="!game.questionVisible">{{ game.currentQuestion?.text }}</span>
+        <button (click)="toggleQuestionVisibility()">{{ game.questionVisible ? 'Hide' : 'Show' }}</button>
+      </div>
+    </div>
+    <div class="toolbar-item timer">
+      <span class="label">Timer (s)</span>
+      <div class="timer-row">
+        <input type="number" [(ngModel)]="timerInput" (change)="setTimerValue(timerInput)" min="0" />
+        <button (click)="startTimer()">Start</button>
+        <button (click)="stopTimer()">Stop</button>
+        <button (click)="clearTimer()">Clear</button>
+        <span class="timer-running" *ngIf="game.timerValue > 0">{{ game.timerValue }}s</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="options-table" *ngIf="game.currentQuestion?.round !== 'Rapid Fire'">
+    <div class="header">#</div>
+    <div class="header">Answer</div>
+    <div class="header">%</div>
+    <div class="header">Action</div>
+    <ng-container *ngFor="let option of game.currentQuestion.options; let i = index">
+      <div class="cell idx">{{ i + 1 }}</div>
+      <div class="cell answer" [class.revealed]="option.revealed">{{ option.answer }}</div>
+      <div class="cell pct">{{ option.percentage }}</div>
+      <div class="cell action">
+        <button (click)="toggleOption(i)">{{ option.revealed ? 'Hide' : 'Show' }}</button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="controls-grid" *ngIf="game.currentQuestion?.round !== 'Rapid Fire'">
+    <div class="group wrong">
+      <span class="label">Wrong</span>
+      <div class="row">
+        <button (click)="incrementWrong()" title="Mark wrong">+X</button>
+        <button (click)="resetWrong()" title="Reset wrongs">Reset</button>
+        <span class="count">Current: {{ wrongCount }}</span>
+      </div>
+    </div>
+
+    <div class="group team">
+      <span class="label">Team & Scores</span>
+      <div class="row team-row">
+        <select [(ngModel)]="selectedTeam" (ngModelChange)="onTeamChange($event)">
+          <option *ngFor="let name of teamNames" [value]="name">{{ name }}</option>
+        </select>
+        <button (click)="updateScore()">Award Revealed</button>
+      </div>
+      <div class="scores-row">
+        <span class="score-tag" *ngFor="let team of game.teams; let i = index">
+          {{ team.name }}: {{ team.score }}
+          <button (click)="addScore(i, 10)" title="+10">+10</button>
+          <button (click)="addScore(i, -10)" title="-10">-10</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="group nav">
+      <span class="label">Navigation</span>
+      <div class="row nav-row">
+        <button (click)="game.previousQuestion()">Prev</button>
+        <button (click)="nextQuestion()">Next</button>
+        <button (click)="resetCurrentQuestion()">Reset Question</button>
+        <button class="danger" (click)="resetGame()">Reset Game</button>
+        <span class="spacer"></span>
+        <button (click)="showNumbers()">Show Numbers</button>
+        <button (click)="hideNumbers()">Hide Numbers</button>
+      </div>
+    </div>
+
+    <div class="group survey">
+      <span class="label">Survey</span>
+      <div class="row">
+        <button (click)="startSurveyForCurrent()">Start (current question)</button>
+        <button (click)="stopSurvey()">Stop</button>
+        <a class="link" href="/survey" target="_blank">Open Survey</a>
+      </div>
+      <div class="row small">Status: {{ surveyActive ? 'Active' : 'Stopped' }}</div>
+    </div>
+  </div>
+
+  <!-- Rapid Fire: unchanged content, with participant selection colocated here -->
+  <div *ngIf="game.currentQuestion?.round === 'Rapid Fire'">
+    <div class="rapid-toolbar">
+      <label class="label">Participants</label>
+      <div class="row">
+        <label>
+          <input type="radio" name="participant" [checked]="selectedParticipant === 1" (change)="onParticipantChange(1)" />
+          P1
+        </label>
+        <label>
+          <input type="radio" name="participant" [checked]="selectedParticipant === 2" (change)="onParticipantChange(2)" />
+          P2
+        </label>
+      </div>
+    </div>
+    <!-- Rapid Fire controls: Prev/Reset and Timer -->
+    <div class="rapid-controls">
+      <div class="row">
+        <button (click)="game.previousQuestion()">Prev</button>
+        <button class="danger" (click)="resetGame()">Reset Game</button>
+      </div>
+      <div class="row">
+        <span class="label">Timer (s)</span>
+        <input type="number" [(ngModel)]="timerInput" (change)="setTimerValue(timerInput)" min="0" />
+        <button (click)="startTimer()">Start</button>
+        <button (click)="stopTimer()">Stop</button>
+        <button (click)="clearTimer()">Clear</button>
+        <span class="timer-running" *ngIf="game.timerValue > 0">{{ game.timerValue }}s</span>
+      </div>
+    </div>
+    <h2>Rapid Fire Round</h2>
+    <table class="rapid-fire-table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>P1 Answer</th>
+          <th>P1 %</th>
+          <th>P2 Answer</th>
+          <th>P2 %</th>
+          <th>Ref</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let q of game.rapidFireQuestions; let i = index">
+          <td class="rapid-fire-question-text">{{ q }}</td>
+          <ng-container *ngIf="ensureRapidRow(i) as row">
+            <td>
+              <input type="text" [(ngModel)]="row.p1.answer" />
+              <button (click)="onLoadP1Answer(i)">Load</button>
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="row.p1.percentage" min="0" max="100" />
+              <button (click)="onLoadP1Percentage(i)">Load</button>
+            </td>
+            <td>
+              <input type="text" [(ngModel)]="row.p2.answer" />
+              <button (click)="onLoadP2Answer(i)">Load</button>
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="row.p2.percentage" min="0" max="100" />
+              <button (click)="onLoadP2Percentage(i)">Load</button>
+            </td>
+          </ng-container>
+          <td>
+            <div *ngIf="(rapidFireRefs[i]?.answers?.length || rapidFireRefs[i]?.percentages?.length); else noRef">
+              <div *ngFor="let j of refIndices(i)">
+                {{ j+1 }}. {{ rapidFireRefs[i]?.answers?.[j] || '—' }} - {{ (rapidFireRefs[i]?.percentages?.[j] ?? '—') }}
+              </div>
+            </div>
+            <ng-template #noRef>—</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

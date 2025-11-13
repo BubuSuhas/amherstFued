@@ -1,0 +1,23 @@
+<div class="survey-wrap">
+  <h2>Family Feud Survey</h2>
+  <div class="card">
+    <div class="qtext" [class.inactive]="!active">
+      {{ questionText }}
+    </div>
+    <div class="note" *ngIf="active">Please enter one short answer. Spelling doesn’t have to be perfect.</div>
+    <div class="note" *ngIf="!active">No active survey at the moment.</div>
+    <form (submit)="$event.preventDefault(); submit();" *ngIf="active && !submitted">
+      <input type="text" maxlength="120" [(ngModel)]="answer" name="answer" placeholder="Your answer" />
+      <button type="submit" [disabled]="!answer.trim() || submitting">Submit</button>
+    </form>
+    <div class="thanks" *ngIf="submitted">Thanks! Your answer has been recorded.</div>
+    <div class="debug">
+      Status: <strong>{{ active ? 'Active' : 'Stopped' }}</strong>
+      • Index: {{ currentQuestionIndex }}
+      • Updated: {{ lastUpdated || '—' }}
+      <button type="button" class="refresh" (click)="fetchState()">Refresh</button>
+    </div>
+    <div class="debug-small" *ngIf="stateRaw">State: {{ stateRaw }}</div>
+  </div>
+  <div class="meta" *ngIf="active">Responses so far: {{ totalResponses }}</div>
+</div>

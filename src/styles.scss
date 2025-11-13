@@ -1,1 +1,205 @@
+/* Family Feud Button Styles */
+button, .feud-btn {
+	font-family: inherit;
+	font-weight: 700;
+	font-size: 1.1rem;
+	border-radius: 1.2vmin;
+	padding: 0.7em 1.6em;
+	margin: 0.3em 0.6em;
+	border: none;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.18), 0 0 0.5em #ffd600 inset;
+	transition: background 0.2s, box-shadow 0.2s;
+}
+.feud-btn-primary, button.feud-btn-primary {
+	background: linear-gradient(90deg, #ffd600 0%, #ffb100 100%);
+	color: #0b1a3a;
+	text-shadow: 0 0 6px #fffbe6, 0 0 2px #ffd600;
+	box-shadow: 0 0 1.2em #ffd600, 0 2px 8px rgba(0,0,0,0.18);
+}
+.feud-btn-secondary, button.feud-btn-secondary {
+	background: linear-gradient(90deg, #1e3f86 0%, #6eb1ff 100%);
+	color: #fff;
+	text-shadow: 0 0 6px #478bff, 0 0 2px #fff;
+	box-shadow: 0 0 1.2em #478bff, 0 2px 8px rgba(0,0,0,0.18);
+}
+button:active, .feud-btn:active {
+	filter: brightness(0.95);
+}
+
+:root {
+	--bg-deep: #0b1a3a;
+	--bg-mid: #13295c;
+	--bg-dot: #1e3f86;
+	--neon-outer: #ffb100;
+	--neon-inner: #ff7a00;
+	--neon-core: #ffc834;
+	--panel-casing: #1a1f2a;
+	--panel-metal: #2c3445;
+	--panel-highlight: #44506a;
+	--slot-edge: #0d0f14;
+	--slot-glow: #1c88ff;
+	--slot-fill-top: #6eb1ff;
+	--slot-fill-mid: #3a7fe0;
+	--slot-fill-bot: #1f55b3;
+	--slot-sheen: #a8d6ff;
+	--score-fill-top: #5ea6ff;
+	--score-fill-bot: #1b4aa8;
+}
+
+.feud-stage {
+	height: 100vh;
+	display: grid;
+	place-items: center;
+	background:
+		radial-gradient(circle at 50% 40%, rgba(255,164,0,.08), transparent 35%),
+		radial-gradient(120vmax 120vmax at 50% -10%, var(--bg-deep) 0%, #071330 55%, #050b23 100%);
+}
+.lightwall {
+	position: relative;
+	width: min(1200px, 95vw);
+	aspect-ratio: 16/9;
+	border-radius: 2vmin;
+	background:
+		radial-gradient(circle at 50% -10%, rgba(255,184,77,.25), transparent 40%),
+		radial-gradient(180% 120% at 50% 100%, var(--bg-deep), var(--bg-mid) 55%, #0a1735 100%);
+	overflow: hidden;
+	box-shadow:
+		0 20px 60px rgba(0,0,0,.55) inset,
+		0 0 0 1px rgba(255,255,255,.03);
+}
+.lightwall::before {
+	content: "";
+	position: absolute; inset: 0;
+	background:
+		radial-gradient(circle, #58a1ff 24%, rgba(88,161,255,0) 27%) 0 0/34px 34px,
+		radial-gradient(circle, #60a9ff 18%, rgba(96,169,255,0) 22%) 17px 17px/34px 34px;
+	opacity: .85;
+	filter: drop-shadow(0 0 2px rgba(88,161,255,.7));
+	mix-blend-mode: screen;
+}
+.arch {
+	position: absolute; inset: 3% 6% 6% 6%;
+	border-radius: 50%/18%;
+	background:
+		linear-gradient(#0a142d,#0a142d) padding-box,
+		radial-gradient(115% 85% at 50% -10%, rgba(255,122,0,.35), rgba(255,177,0,.2) 35%, rgba(255,200,52,.15) 52%, rgba(255,200,52,0) 53%) border-box;
+	border: min(20px,2.2vmin) solid transparent;
+	box-shadow:
+		0 0 0 .6vmin rgba(255,193,59,.8) inset,
+		0 0 2vmin .2vmin rgba(255,140,0,.85) inset,
+		0 .6vmin 2.6vmin rgba(255,140,0,.6);
+}
+.feud-board {
+	position: absolute;
+	left: 50%; top: 53%;
+	transform: translate(-50%,-50%);
+	width: min(1020px, 82vw);
+	border-radius: 2.4vmin;
+	padding: 1.2vmin;
+	background:
+		radial-gradient(140% 220% at 50% -80%, rgba(255,193,59,.65), rgba(255,122,0,.55) 45%, rgba(255,122,0,0) 60%) border-box,
+		linear-gradient(var(--panel-casing), #0c1224) padding-box;
+	box-shadow:
+		0 0 0 1.2vmin rgba(255,159,25,.95) inset,
+		0 0 3vmin .2vmin rgba(255,136,0,.75) inset,
+		0 .6vmin 2.8vmin rgba(0,0,0,.9);
+}
+.feud-board::before {
+	content: "";
+	position: absolute; inset: 1.8vmin;
+	border-radius: 1.8vmin;
+	background: linear-gradient(#101623,#0d1427);
+	box-shadow: 0 0 0 .45vmin #05080f inset, 0 0 0 1.2vmin #2a3347 inset;
+}
+.feud-score {
+	position: absolute;
+	top: -8vmin; left: 50%;
+	transform: translateX(-50%);
+	width: min(300px,34vw);
+	height: min(140px,14vmin);
+	border-radius: 1.6vmin;
+	padding: 1vmin;
+	background:
+		linear-gradient(#515b70,#2f3a53) padding-box,
+		linear-gradient(180deg, rgba(0,0,0,.35), rgba(255,188,0,.35)) border-box;
+	box-shadow:
+		0 0 0 .7vmin rgba(41,49,66,1) inset,
+		0 .5vmin 2vmin rgba(0,0,0,.7);
+	display: grid; place-items: center;
+}
+.feud-score-digit {
+	font-weight: 800;
+	font-size: clamp(42px, 7.4vmin, 90px);
+	letter-spacing: .02em;
+	color: #e9f0ff;
+	text-shadow:
+		0 0 .4vmin #cfe1ff,
+		0 0 1.2vmin #8bb5ff,
+		0 0 2.2vmin #478bff;
+}
+.feud-slots {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.2vmin 2.2vmin;
+	padding: 3.2vmin 2.6vmin 2.6vmin;
+}
+.feud-slot {
+	position: relative;
+	height: min(84px,8.8vmin);
+	border-radius: 1.2vmin;
+	padding: .9vmin;
+	background:
+		linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0)) border-box;
+	box-shadow:
+		0 .35vmin .6vmin rgba(0,0,0,.65);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.feud-slot-answer {
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #fff;
+	text-shadow: 0 0 6px #478bff, 0 0 2px #fff;
+	flex: 1;
+	padding-left: 1.2vmin;
+}
+.feud-slot-score {
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: #ffc834;
+	text-shadow: 0 0 6px #ffb100, 0 0 2px #fff;
+	padding-right: 1.2vmin;
+}
+.pearls {
+	position: absolute; inset: -1.8vmin;
+	border-radius: 2.4vmin;
+	pointer-events: none;
+}
+.pearls::before {
+	content: "";
+	position: absolute; inset: 0;
+	border-radius: inherit;
+	--g: repeating-radial-gradient(circle at 0 0, transparent 0 9.6px, rgba(255,172,22,.18) 9.6px 12.3px);
+	background:
+		radial-gradient(circle at 6% 7%, rgba(255,196,77,.6), transparent 35%),
+		radial-gradient(circle at 94% 7%, rgba(255,196,77,.6), transparent 35%),
+		radial-gradient(circle at 6% 93%, rgba(255,196,77,.55), transparent 35%),
+		radial-gradient(circle at 94% 93%, rgba(255,196,77,.55), transparent 35%),
+		var(--g);
+	mix-blend-mode: screen;
+	opacity: .55;
+	filter: blur(.2px);
+}
+.side-panel {
+	position: absolute;
+	top: 3%; bottom: 9%;
+	width: 4.6vmin;
+	background: linear-gradient(180deg, #2a3349, #1b2235);
+	border-radius: 1.2vmin;
+	box-shadow: inset 0 0 0 .3vmin #0c1221, 0 0 2.4vmin rgba(0,0,0,.5);
+}
+.side-panel.left { left: 1.8%; }
+.side-panel.right { right: 1.8%; }
 /* You can add global styles to this file, and also import other style files */
