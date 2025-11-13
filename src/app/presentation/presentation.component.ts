@@ -422,14 +422,32 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   // Prefer external SFX for wrong; fallback to long/short buzzer
   private playWrongSound(preferShort: boolean) {
     if (this.sfx['wrong'] && this.sfxReady['wrong']) {
-      this.playOneShot(this.sfx['wrong']);
+      try {
+        // Try playing the preloaded element; on failure, fall back to buzzer
+        this.sfx['wrong'].pause();
+        try { this.sfx['wrong'].currentTime = 0; } catch {}
+        this.sfx['wrong'].play().catch(() => {
+          if (preferShort) this.playShortBuzzer(); else this.playBuzzer();
+        });
+      } catch {
+        if (preferShort) this.playShortBuzzer(); else this.playBuzzer();
+      }
     } else {
       if (preferShort) this.playShortBuzzer(); else this.playBuzzer();
     }
   }
 
   private playBoardLoadSound() {
-    if (this.sfx['board'] && this.sfxReady['board']) this.playOneShot(this.sfx['board']);
+    if (this.sfx['board'] && this.sfxReady['board']) {
+      try {
+        this.sfx['board'].pause();
+        try { this.sfx['board'].currentTime = 0; } catch {}
+        this.sfx['board'].play().catch(() => this.playRevealChime());
+      } catch { this.playRevealChime(); }
+    } else {
+      // Fallback to a pleasant reveal chime
+      this.playRevealChime();
+    }
   }
 
   private playRapidLoadSound() {
@@ -624,7 +642,10 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
         const el = this.sfx['fast'];
         try { el.pause(); } catch {}
         try { el.currentTime = 0; } catch {}
-        el.play().catch(() => {});
+        el.play().catch(() => {
+          // Fallback: if theme fails, at least play the board load cue
+          this.playBoardLoadSound();
+        });
       } else {
         // Fallback: play the board load sound if theme not ready
         this.playBoardLoadSound();
