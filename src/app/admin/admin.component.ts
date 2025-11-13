@@ -256,10 +256,7 @@ export class AdminComponent implements DoCheck {
   // Play the Fast Money sound on demand (available across admin)
   playFastMoney() {
     try {
-      // Play locally for preview
-      const a = new Audio('/sounds/family-feud-fast-money.mp3');
-      a.play().catch(() => {});
-      // Also broadcast to presentation via WebSocket
+      // Broadcast to presentation via WebSocket only (no local admin audio)
       this.game.playFastMoneyCue?.();
     } catch {}
   }
