@@ -16,7 +16,7 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   private lastShowWrong = false;
   private removeInteractionListeners?: () => void;
   public audioReady = false;
-  private audioUnlockedOnce = false; // persisted across reloads
+  public audioUnlockedOnce = false; // persisted across reloads
   public showAudioNudge = false; // small button hint after first unlock
   private lastBuzzerAt = 0;
   private seenJustRevealed = new Set<number>();
