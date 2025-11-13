@@ -600,6 +600,11 @@ export class GameService {
       case 'sync':
         this.applyState(msg.data);
         break;
+      case 'event':
+        if (msg.event === 'fastMoney') {
+          try { (this as any)._onFastMoney?.(); } catch {}
+        }
+        break;
       // handle other message types if needed
     }
   }
@@ -630,5 +635,14 @@ export class GameService {
     // Toggle for next question (always alternate 0 <-> 1)
     (this as any)[idxRef] = nextIdx === 0 ? 1 : 0;
     this.lastAutoGroupKey = key;
+  }
+
+  // Broadcast a cue for playing the Fast Money theme on presentation
+  playFastMoneyCue() {
+    try {
+      if (this.isAdmin && this.ws && this.ws.readyState === 1) {
+        this.ws.send(JSON.stringify({ type: 'event', event: 'fastMoney' }));
+      }
+    } catch {}
   }
 }

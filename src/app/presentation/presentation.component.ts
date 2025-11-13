@@ -26,8 +26,9 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
     tick?: HTMLAudioElement;
     board?: HTMLAudioElement;
     rapid?: HTMLAudioElement;
+    fast?: HTMLAudioElement;
   } = {};
-  private sfxReady: { [k: string]: boolean } = { reveal: false, wrong: false, tick: false, board: false, rapid: false };
+  private sfxReady: { [k: string]: boolean } = { reveal: false, wrong: false, tick: false, board: false, rapid: false, fast: false };
   private tickInterval: any = null;
   constructor(public game: GameService, private cdr: ChangeDetectorRef) {
     // Listen for state changes and trigger change detection
@@ -68,6 +69,10 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
           }
         }
       } catch {}
+    };
+    // Fast Money cue from admin broadcast
+    (game as any)._onFastMoney = () => {
+      try { this.playFastMoneyTheme(); } catch {}
     };
   }
 
@@ -372,7 +377,7 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   private loadSfx() {
     try {
       const base = '/sounds/'; // served from public/sounds
-      const make = (key: 'reveal'|'wrong'|'board'|'tick'|'rapid', file: string) => {
+      const make = (key: 'reveal'|'wrong'|'board'|'tick'|'rapid'|'fast', file: string) => {
         const a = new Audio(base + file);
         a.preload = 'auto';
         a.addEventListener('canplaythrough', () => { this.sfxReady[key] = true; }, { once: true });
@@ -386,6 +391,7 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   this.sfx.board  = make('board',  'family-feud-next-question.mp3');
       this.sfx.tick   = make('tick',   'feud-tick.mp3');
       this.sfx.rapid  = make('rapid',  'feud-rapid-load.mp3');
+      this.sfx.fast   = make('fast',   'family-feud-fast-money.mp3');
       this.sfx['tick'].loop = true;
       this.sfx['tick'].volume = 0.5;
     } catch {}
@@ -506,6 +512,17 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
       gain.connect(ctx.destination);
       osc.start(now);
       osc.stop(now + 0.16);
+    } catch {}
+  }
+
+  private playFastMoneyTheme() {
+    try {
+      if (this.sfx['fast'] && this.sfxReady['fast']) {
+        this.playOneShot(this.sfx['fast']);
+      } else {
+        // Fallback: play the board load sound if theme not ready
+        this.playBoardLoadSound();
+      }
     } catch {}
   }
 }
