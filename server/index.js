@@ -273,6 +273,14 @@ wss.on('connection', ws => {
             client.send(JSON.stringify({ type: 'sync', data: gameState }));
           }
         });
+      } else if (msg.type === 'event') {
+        // Broadcast ephemeral events (e.g., audio cues) to all clients
+        const payload = { type: 'event', event: msg.event, payload: msg.payload };
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(payload));
+          }
+        });
       }
     } catch (e) {
       console.error('Invalid message', e);
