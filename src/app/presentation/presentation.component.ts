@@ -16,6 +16,8 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   private lastShowWrong = false;
   private removeInteractionListeners?: () => void;
   public audioReady = false;
+  private audioUnlockedOnce = false; // persisted across reloads
+  public showAudioNudge = false; // small button hint after first unlock
   private lastBuzzerAt = 0;
   private seenJustRevealed = new Set<number>();
   private lastQuestionIndex = -1;
@@ -161,6 +163,14 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
     this.removeInteractionListeners = () => {
       listeners.forEach(([evt, fn]) => window.removeEventListener(evt as any, fn as any));
     };
+
+    // If audio was unlocked before, aggressively auto-resume on visibility/focus
+    try {
+      this.audioUnlockedOnce = !!window.localStorage.getItem('feud.audioUnlockedOnce');
+    } catch {}
+    if (this.audioUnlockedOnce) {
+      this.installAutoResume();
+    }
   }
 
   private async initAudio() {
@@ -171,7 +181,25 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
       const ctx = this.audioCtx;
       if (!ctx) return;
       const wasRunning = (ctx.state === 'running');
-      if (ctx.state === 'suspended') await ctx.resume();
+      if (ctx.state === 'suspended') {
+        try { await ctx.resume(); } catch {}
+      }
+      // Track state changes to auto-resume and update UI
+      try {
+        ctx.onstatechange = () => {
+          const running = (ctx.state === 'running');
+          this.audioReady = running;
+          if (!running) {
+            // After first unlock, show a small nudge instead of fullscreen overlay
+            this.showAudioNudge = this.audioUnlockedOnce;
+            // Attempt auto-resume if page is visible
+            if (document.visibilityState === 'visible') this.tryResumeSoon();
+          } else {
+            this.showAudioNudge = false;
+          }
+          this.cdr.markForCheck();
+        };
+      } catch {}
       // Try to load external SFX once audio is permitted
       this.loadSfx();
       // Clean up interaction listeners after success
@@ -181,6 +209,12 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
       // If we transitioned into running, play a short confirmation beep
       if (this.audioReady && !wasRunning) {
         this.playTestBeep();
+        // Persist the one-time unlock for this browser
+        try {
+          window.localStorage.setItem('feud.audioUnlockedOnce', '1');
+          this.audioUnlockedOnce = true;
+        } catch {}
+        this.installAutoResume();
       }
       this.cdr.markForCheck();
     } catch {}
@@ -189,6 +223,34 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   public async enableAudio() {
     await this.initAudio();
     // Optional: leave as no-op now that audio is auto-enabled
+  }
+
+  private installAutoResume() {
+    // Keep trying to resume when visible without requiring overlay clicks
+    const tryResume = () => this.tryResumeSoon();
+    window.addEventListener('visibilitychange', tryResume);
+    window.addEventListener('focus', tryResume);
+    window.addEventListener('pageshow', tryResume);
+    // Light keep-alive: periodically nudge resume while visible
+    setInterval(() => {
+      if (document.visibilityState === 'visible') this.tryResumeSoon();
+    }, 20000);
+  }
+
+  private async tryResumeSoon() {
+    try {
+      const ctx = this.audioCtx;
+      if (!ctx) return;
+      if (ctx.state !== 'running') {
+        await ctx.resume();
+        const st: any = (ctx as any).state;
+        if (st === 'running') {
+          this.audioReady = true;
+          this.showAudioNudge = false;
+          this.cdr.markForCheck();
+        }
+      }
+    } catch {}
   }
 
   private async playBuzzer() {
@@ -399,6 +461,8 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
 
   private playOneShot(sample: HTMLAudioElement) {
     try {
+      // Ensure context is running if possible
+      this.tryResumeSoon();
       const a = new Audio(sample.src);
       a.play().catch(() => {});
     } catch {}
@@ -517,6 +581,7 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
 
   private playFastMoneyTheme() {
     try {
+      this.tryResumeSoon();
       if (this.sfx['fast'] && this.sfxReady['fast']) {
         // Use the preloaded element to improve reliability post-unlock
         const el = this.sfx['fast'];

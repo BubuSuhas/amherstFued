@@ -395,3 +395,21 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
   box-shadow: 0 4px 12px rgba(0,0,0,.25);
 }
 .audio-unlock-btn:hover { filter: brightness(1.06); }
+
+/* Small re-enable chip after first unlock */
+.audio-nudge {
+  position: fixed;
+  right: 1rem;
+  top: 1rem;
+  z-index: 2001;
+  padding: 0.45rem 0.8rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #0a1a3a;
+  background: #ffd84d;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  cursor: pointer;
+}
+.audio-nudge:hover { filter: brightness(1.06); }

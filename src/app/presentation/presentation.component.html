@@ -95,10 +95,20 @@
 </div>
 
 <!-- Audio unlock overlay shown until the browser allows sound -->
-<div class="audio-unlock" *ngIf="!audioReady" (click)="enableAudio()" tabindex="0" (keydown)="enableAudio()">
+<div class="audio-unlock" *ngIf="!audioReady && !audioUnlockedOnce" (click)="enableAudio()" tabindex="0" (keydown)="enableAudio()">
   <div class="audio-unlock-box">
     <div class="audio-unlock-title">Enable Sound</div>
     <div class="audio-unlock-hint">Click or press any key on this screen</div>
   </div>
   <button class="audio-unlock-btn" type="button">Enable</button>
 </div>
+
+<!-- Small re-enable chip after first unlock, if audio suspends later -->
+<button
+  *ngIf="showAudioNudge && !audioReady && audioUnlockedOnce"
+  class="audio-nudge"
+  type="button"
+  (click)="enableAudio()"
+>
+  Enable sound
+ </button>
