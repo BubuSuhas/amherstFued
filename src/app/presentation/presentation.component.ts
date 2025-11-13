@@ -18,6 +18,7 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   public audioReady = false;
   public audioUnlockedOnce = false; // persisted across reloads
   public showAudioNudge = false; // small button hint after first unlock
+  private sfxPrimed = false; // ensure HTMLAudioElements are primed post-unlock
   private lastBuzzerAt = 0;
   private seenJustRevealed = new Set<number>();
   private lastQuestionIndex = -1;
@@ -214,7 +215,9 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
           window.localStorage.setItem('feud.audioUnlockedOnce', '1');
           this.audioUnlockedOnce = true;
         } catch {}
-        this.installAutoResume();
+  this.installAutoResume();
+  // Prime SFX elements for better reliability across browsers
+  this.primeSfx();
       }
       this.cdr.markForCheck();
     } catch {}
@@ -250,6 +253,28 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
           this.cdr.markForCheck();
         }
       }
+    } catch {}
+  }
+
+  private async primeSfx() {
+    if (this.sfxPrimed) return;
+    try {
+      const keys = Object.keys(this.sfx) as Array<keyof typeof this.sfx>;
+      for (const k of keys) {
+        const el = this.sfx[k];
+        if (!el) continue;
+        const prevMuted = el.muted;
+        const prevVol = el.volume;
+        try {
+          el.muted = true;
+          el.volume = 0;
+          el.currentTime = 0;
+          await el.play().catch(() => {});
+          el.pause();
+        } catch {}
+        try { el.muted = prevMuted; el.volume = prevVol; } catch {}
+      }
+      this.sfxPrimed = true;
     } catch {}
   }
 
@@ -417,6 +442,8 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
   }
 
   private startTick() {
+  // Nudge resume when timer starts
+  this.tryResumeSoon();
   if (this.sfx['tick'] && this.sfxReady['tick']) {
       try {
   this.sfx['tick'].loop = true;
@@ -463,8 +490,18 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
     try {
       // Ensure context is running if possible
       this.tryResumeSoon();
-      const a = new Audio(sample.src);
-      a.play().catch(() => {});
+      // Prefer playing the preloaded element directly; fallback to clone if blocked
+      try {
+        sample.pause();
+        try { sample.currentTime = 0; } catch {}
+        sample.play().catch(() => {
+          const a = new Audio(sample.src);
+          a.play().catch(() => {});
+        });
+      } catch {
+        const a = new Audio(sample.src);
+        a.play().catch(() => {});
+      }
     } catch {}
   }
 
