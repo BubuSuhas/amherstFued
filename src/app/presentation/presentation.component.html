@@ -8,7 +8,12 @@
     <div class="side-panel left">
       <div class="feud-team-score-panel">
         <span>{{ game.selectedTeam }}: {{ selectedTeamScore }}</span>
-        <span class="feud-team-wrong-x">{{ 'X'.repeat(game.wrongCount) }}</span>
+        <ng-container *ngIf="!game.isRapidRound; else rapidTarget">
+          <span class="feud-team-wrong-x">{{ 'X'.repeat(game.wrongCount) }}</span>
+        </ng-container>
+        <ng-template #rapidTarget>
+          <span class="feud-team-target">Target: {{ game.rapidTargetPoints }}</span>
+        </ng-template>
       </div>
     </div>
   <div class="board" [class.rapid]="game.isRapidRound">
@@ -112,3 +117,11 @@
 >
   Enable sound
  </button>
+
+  <!-- Winner overlay for rapid fire -->
+  <div class="winner-overlay" *ngIf="game.rapidWinnerTeam">
+    <div class="winner-box">
+      <div class="winner-title">Winner!</div>
+      <div class="winner-team">{{ game.rapidWinnerTeam }}</div>
+    </div>
+  </div>

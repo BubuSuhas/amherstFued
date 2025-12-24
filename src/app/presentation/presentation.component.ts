@@ -77,6 +77,10 @@ export class PresentationComponent implements DoCheck, AfterViewInit {
     (game as any)._onFastMoney = () => {
       try { this.playFastMoneyTheme(); } catch {}
     };
+    // Rapid winner reached
+    (game as any)._onRapidWin = (team: string) => {
+      try { this.playBoardLoadSound(); } catch {}
+    };
   }
 
   // Used to trigger slot animation when just revealed

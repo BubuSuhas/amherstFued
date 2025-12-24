@@ -15,13 +15,17 @@ export class AdminComponent implements DoCheck {
   timerInput: number = 0;
   selectedTeam: string = 'Team A';
   teamNames = ['Team A', 'Team B'];
-  selectedParticipant: number = 1;
+  selectedParticipant: number = 1; // still used for data entry order, but team selection controls scoring
 
   // Store rapid fire answers for both participants
   rapidFireInputs: { p1: { answer: string; percentage: number }, p2: { answer: string; percentage: number } }[] = [];
 
   // Reference answers and percentages for each rapid fire question
   rapidFireRefs: { answers: string[]; percentages: number[] }[] = [];
+  // Selected reference index for loading P1 percentage per question (1..8)
+  rapidPctSourceIndexP1: number[] = [];
+  // Selected reference index for loading P2 percentage per question (1..8)
+  rapidPctSourceIndexP2: number[] = [];
 
   constructor(public game: GameService) {
     this.game.setAdminMode(true);
@@ -32,10 +36,12 @@ export class AdminComponent implements DoCheck {
     this.rapidFireRefs = this.game.rapidFireQuestions.map(q => {
       const ref = this.game.questions.find(qn => qn.text === q);
       return {
-        answers: ref ? ref.options.slice(0, 5).map(opt => opt.answer) : Array(5).fill(''),
-        percentages: ref ? ref.options.slice(0, 5).map(opt => opt.percentage) : Array(5).fill(0)
+        answers: ref ? ref.options.slice(0, 8).map(opt => opt.answer) : Array(8).fill(''),
+        percentages: ref ? ref.options.slice(0, 8).map(opt => opt.percentage) : Array(8).fill(0)
       };
     });
+    this.rapidPctSourceIndexP1 = this.game.rapidFireQuestions.map(() => 1);
+    this.rapidPctSourceIndexP2 = this.game.rapidFireQuestions.map(() => 1);
   }
 
   ngOnInit(): void {
@@ -58,10 +64,20 @@ export class AdminComponent implements DoCheck {
       this.rapidFireRefs = this.game.rapidFireQuestions.map(q => {
         const ref = this.game.questions.find(qn => qn.text === q);
         return {
-          answers: ref ? ref.options.slice(0, 5).map(opt => opt.answer) : Array(5).fill(''),
-          percentages: ref ? ref.options.slice(0, 5).map(opt => opt.percentage) : Array(5).fill(0)
+          answers: ref ? ref.options.slice(0, 8).map(opt => opt.answer) : Array(8).fill(''),
+          percentages: ref ? ref.options.slice(0, 8).map(opt => opt.percentage) : Array(8).fill(0)
         };
       });
+    }
+    if (this.rapidPctSourceIndexP1.length !== needLen) {
+      const next: number[] = [];
+      for (let i = 0; i < needLen; i++) next[i] = this.rapidPctSourceIndexP1[i] ?? 1;
+      this.rapidPctSourceIndexP1 = next;
+    }
+    if (this.rapidPctSourceIndexP2.length !== needLen) {
+      const next2: number[] = [];
+      for (let i = 0; i < needLen; i++) next2[i] = this.rapidPctSourceIndexP2[i] ?? 1;
+      this.rapidPctSourceIndexP2 = next2;
     }
   }
 
@@ -99,10 +115,12 @@ export class AdminComponent implements DoCheck {
       this.rapidFireRefs = this.game.rapidFireQuestions.map(q => {
         const ref = this.game.questions.find(qn => qn.text === q);
         return {
-          answers: ref ? ref.options.slice(0, 5).map(opt => opt.answer) : Array(5).fill(''),
-          percentages: ref ? ref.options.slice(0, 5).map(opt => opt.percentage) : Array(5).fill(0)
+          answers: ref ? ref.options.slice(0, 8).map(opt => opt.answer) : Array(8).fill(''),
+          percentages: ref ? ref.options.slice(0, 8).map(opt => opt.percentage) : Array(8).fill(0)
         };
       });
+      this.rapidPctSourceIndexP1 = this.game.rapidFireQuestions.map(() => 1);
+      this.rapidPctSourceIndexP2 = this.game.rapidFireQuestions.map(() => 1);
     }
   }
 
@@ -123,10 +141,24 @@ export class AdminComponent implements DoCheck {
     this.rapidFireRefs = this.game.rapidFireQuestions.map(q => {
       const ref = this.game.questions.find(qn => qn.text === q);
       return {
-        answers: ref ? ref.options.slice(0, 5).map(opt => opt.answer) : Array(5).fill(''),
-        percentages: ref ? ref.options.slice(0, 5).map(opt => opt.percentage) : Array(5).fill(0)
+        answers: ref ? ref.options.slice(0, 8).map(opt => opt.answer) : Array(8).fill(''),
+        percentages: ref ? ref.options.slice(0, 8).map(opt => opt.percentage) : Array(8).fill(0)
       };
     });
+    this.rapidPctSourceIndexP1 = this.game.rapidFireQuestions.map(() => 1);
+    this.rapidPctSourceIndexP2 = this.game.rapidFireQuestions.map(() => 1);
+  }
+
+  // Reset the Rapid Fire round: clear all P1/P2 answers and percentages
+  resetRapidRound() {
+    this.game.resetRapidRound();
+    // Reset local admin inputs and selection indices
+    this.rapidFireInputs = this.game.rapidFireQuestions.map(() => ({
+      p1: { answer: '', percentage: 0 },
+      p2: { answer: '', percentage: 0 }
+    }));
+    this.rapidPctSourceIndexP1 = this.game.rapidFireQuestions.map(() => 1);
+    this.rapidPctSourceIndexP2 = this.game.rapidFireQuestions.map(() => 1);
   }
 
   resetCurrentQuestion() {
@@ -150,10 +182,12 @@ export class AdminComponent implements DoCheck {
       this.rapidFireRefs = this.game.rapidFireQuestions.map(q => {
         const ref = this.game.questions.find(qn => qn.text === q);
         return {
-          answers: ref ? ref.options.slice(0, 5).map(opt => opt.answer) : Array(5).fill(''),
-          percentages: ref ? ref.options.slice(0, 5).map(opt => opt.percentage) : Array(5).fill(0)
+          answers: ref ? ref.options.slice(0, 8).map(opt => opt.answer) : Array(8).fill(''),
+          percentages: ref ? ref.options.slice(0, 8).map(opt => opt.percentage) : Array(8).fill(0)
         };
       });
+      this.rapidPctSourceIndexP1 = this.game.rapidFireQuestions.map(() => 1);
+      this.rapidPctSourceIndexP2 = this.game.rapidFireQuestions.map(() => 1);
     };
     reader.readAsArrayBuffer(file);
   }
@@ -220,15 +254,22 @@ export class AdminComponent implements DoCheck {
     }
   }
   onLoadP1Percentage(i: number) {
-    if (this.rapidFireInputs[i] && this.rapidFireInputs[i].p1.percentage !== undefined) {
-      this.game.rapidAnswers.participant1[i].percentage = this.rapidFireInputs[i].p1.percentage;
-      // Mark as explicitly loaded so 0 can be displayed/sounded
-      if (!this.game.rapidPercentageLoaded) {
-        this.game.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) } as any;
-      }
-      this.game.rapidPercentageLoaded.participant1[i] = true;
-      this.game.syncState();
+    const ref = this.rapidFireRefs[i];
+    const chosen = (this.rapidPctSourceIndexP1[i] | 0);
+    let val = 0;
+    if (chosen === 0) {
+      val = 0; // explicit 0 selection
+    } else {
+      const sel = chosen - 1; // 1-based to 0-based
+      val = (ref && ref.percentages && ref.percentages[sel] != null) ? Number(ref.percentages[sel]) : 0;
     }
+    this.game.rapidAnswers.participant1[i].percentage = val;
+    // Mark as explicitly loaded so 0 can be displayed/sounded
+    if (!this.game.rapidPercentageLoaded) {
+      this.game.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) } as any;
+    }
+    this.game.rapidPercentageLoaded.participant1[i] = true;
+    this.game.syncState();
   }
   onLoadP2Answer(i: number) {
     if (this.rapidFireInputs[i] && this.rapidFireInputs[i].p2.answer !== undefined) {
@@ -237,20 +278,33 @@ export class AdminComponent implements DoCheck {
     }
   }
   onLoadP2Percentage(i: number) {
-    if (this.rapidFireInputs[i] && this.rapidFireInputs[i].p2.percentage !== undefined) {
-      this.game.rapidAnswers.participant2[i].percentage = this.rapidFireInputs[i].p2.percentage;
-      if (!this.game.rapidPercentageLoaded) {
-        this.game.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) } as any;
-      }
-      this.game.rapidPercentageLoaded.participant2[i] = true;
-      this.game.syncState();
+    const ref = this.rapidFireRefs[i];
+    const chosen = (this.rapidPctSourceIndexP2[i] | 0);
+    let val = 0;
+    if (chosen === 0) {
+      val = 0; // explicit 0 selection
+    } else {
+      const sel = chosen - 1; // 1-based to 0-based
+      val = (ref && ref.percentages && ref.percentages[sel] != null) ? Number(ref.percentages[sel]) : 0;
     }
+    this.game.rapidAnswers.participant2[i].percentage = val;
+    if (!this.game.rapidPercentageLoaded) {
+      this.game.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) } as any;
+    }
+    this.game.rapidPercentageLoaded.participant2[i] = true;
+    this.game.syncState();
   }
 
   onParticipantChange(participant: number) {
     this.selectedParticipant = participant;
     this.game.selectedParticipant = participant;
+    // Participant selection no longer maps to team scoring
     this.game.syncState();
+  }
+
+  onRapidTeamChange(team: string) {
+    this.selectedTeam = team;
+    this.game.setRapidTeam(team);
   }
 
   // Play the Fast Money sound on demand (available across admin)
@@ -258,6 +312,18 @@ export class AdminComponent implements DoCheck {
     try {
       // Broadcast to presentation via WebSocket only (no local admin audio)
       this.game.playFastMoneyCue?.();
+    } catch {}
+  }
+
+  // Award the current total Rapid score to the team corresponding to selected participant
+  updateRapidScoreForSelectedTeam() {
+    this.game.awardRapidScoreForSelectedTeam();
+  }
+
+  // Play wrong-answer sound on presentation during rapid round
+  playRapidWrong() {
+    try {
+      this.game.playWrongCue?.();
     } catch {}
   }
 

@@ -136,15 +136,15 @@
   <!-- Rapid Fire: unchanged content, with participant selection colocated here -->
   <div *ngIf="game.currentQuestion?.round === 'Rapid Fire'">
     <div class="rapid-toolbar">
-      <label class="label">Participants</label>
+      <label class="label">Rapid Team</label>
       <div class="row">
         <label>
-          <input type="radio" name="participant" [checked]="selectedParticipant === 1" (change)="onParticipantChange(1)" />
-          P1
+          <input type="radio" name="rapidTeam" [checked]="selectedTeam === 'Team A'" (change)="onRapidTeamChange('Team A')" />
+          Team A
         </label>
         <label>
-          <input type="radio" name="participant" [checked]="selectedParticipant === 2" (change)="onParticipantChange(2)" />
-          P2
+          <input type="radio" name="rapidTeam" [checked]="selectedTeam === 'Team B'" (change)="onRapidTeamChange('Team B')" />
+          Team B
         </label>
       </div>
     </div>
@@ -153,6 +153,8 @@
       <div class="row">
         <button (click)="game.previousQuestion()">Prev</button>
         <button class="danger" (click)="resetGame()">Reset Game</button>
+        <button (click)="resetRapidRound()" title="Clear all rapid entries">Reset Rapid Round</button>
+        <button (click)="playRapidWrong()" title="Play wrong-answer sound on presentation">Play Wrong Sound</button>
       </div>
       <div class="row">
         <span class="label">Timer (s)</span>
@@ -184,7 +186,10 @@
               <button (click)="onLoadP1Answer(i)">Load</button>
             </td>
             <td>
-              <input type="number" [(ngModel)]="row.p1.percentage" min="0" max="100" />
+              <select [(ngModel)]="rapidPctSourceIndexP1[i]">
+                <option [value]="0">0</option>
+                <option *ngFor="let n of [1,2,3,4,5,6,7,8]" [value]="n">{{ n }}</option>
+              </select>
               <button (click)="onLoadP1Percentage(i)">Load</button>
             </td>
             <td>
@@ -192,7 +197,10 @@
               <button (click)="onLoadP2Answer(i)">Load</button>
             </td>
             <td>
-              <input type="number" [(ngModel)]="row.p2.percentage" min="0" max="100" />
+              <select [(ngModel)]="rapidPctSourceIndexP2[i]">
+                <option [value]="0">0</option>
+                <option *ngFor="let n of [1,2,3,4,5,6,7,8]" [value]="n">{{ n }}</option>
+              </select>
               <button (click)="onLoadP2Percentage(i)">Load</button>
             </td>
           </ng-container>

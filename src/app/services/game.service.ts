@@ -44,6 +44,12 @@ export class GameService {
     const sum2 = (this.rapidAnswers?.participant2 ?? []).reduce((acc: number, a: RapidAnswer) => acc + (a.percentage || 0), 0);
     return sum1 + sum2;
   }
+  get totalRapidScoreP1(): number {
+    return (this.rapidAnswers?.participant1 ?? []).reduce((acc: number, a: RapidAnswer) => acc + (a.percentage || 0), 0);
+  }
+  get totalRapidScoreP2(): number {
+    return (this.rapidAnswers?.participant2 ?? []).reduce((acc: number, a: RapidAnswer) => acc + (a.percentage || 0), 0);
+  }
   teams: Team[] = [
     { name: 'Team A', score: 0 },
     { name: 'Team B', score: 0 }
@@ -131,6 +137,11 @@ export class GameService {
   rapidLoaded: boolean = false;
   isRapidRound: boolean = false;
   rapidFireQuestions: string[] = [];
+  // Track previously awarded rapid totals per team to make updates idempotent
+  rapidAppliedTeamA: number = 0;
+  rapidAppliedTeamB: number = 0;
+  rapidTargetPoints: number = 200;
+  rapidWinnerTeam: string | null = null;
 
   selectedParticipant: number = 1;
   selectedTeam: string = 'Team A'; // Add selectedTeam property to GameService
@@ -345,6 +356,8 @@ export class GameService {
             try { (this as any)._onRapidLoad('p2', i, 'percentage', val); } catch {}
           }
         }
+        // After processing rapid updates, check win condition
+        this.evaluateRapidWin();
       } catch {}
 
       // Notify timer running change for tick sound
@@ -389,6 +402,11 @@ export class GameService {
       // Always check the round property of the current question
       const currentRound = this.questions[this.currentQuestionIndex]?.round?.toLowerCase();
       this.isRapidRound = currentRound === 'rapid fire';
+      // Upon entering rapid fire, reset both team scores to 0
+      if (this.isRapidRound) {
+        this.teams.forEach(t => t.score = 0);
+        this.syncRapidTeamScore();
+      }
       // Reset wrong hits on next question
       this.wrongCount = 0;
       this.showWrong = false;
@@ -402,6 +420,10 @@ export class GameService {
       // If at the end, check if last question is rapid fire
       const currentRound = this.questions[this.currentQuestionIndex]?.round?.toLowerCase();
       this.isRapidRound = currentRound === 'rapid fire';
+      if (this.isRapidRound) {
+        this.teams.forEach(t => t.score = 0);
+        this.syncRapidTeamScore();
+      }
       // Also reset wrong hits when attempting to go beyond
       this.wrongCount = 0;
       this.showWrong = false;
@@ -458,6 +480,9 @@ export class GameService {
     this.rapidActualAnswers = Array(10).fill(0).map(() => ({ answer: '', percentage: 0 }));
     this.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) };
     this.rapidLoaded = false;
+    this.rapidAppliedTeamA = 0;
+    this.rapidAppliedTeamB = 0;
+    this.rapidWinnerTeam = null;
     // Reset rapid flag based on first question
     const firstRound = this.questions?.[0]?.round?.toLowerCase?.();
     this.isRapidRound = firstRound === 'rapid fire';
@@ -469,6 +494,7 @@ export class GameService {
   this.rapidAnswers.participant1 = Array(10).fill(0).map(() => ({ answer: '', percentage: 0 }));
   this.rapidAnswers.participant2 = Array(10).fill(0).map(() => ({ answer: '', percentage: 0 }));
   this.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) };
+      // Keep applied totals until explicit rapid reset
     } else {
       this.currentQuestion.options.forEach(o => { o.revealed = false; o.justRevealed = false; });
     }
@@ -488,14 +514,14 @@ export class GameService {
       const roundType = row[roundIdx]?.toLowerCase();
       if (roundType === 'rapid fire') {
         this.rapidFireQuestions.push(row[1]);
-        // Parse up to 5 rapid fire answers for this question
+        // Parse up to 8 rapid fire answers for this question
         const options = [];
-        for (let j = 2; j < 2 + 5 * 2; j += 2) {
+        for (let j = 2; j < 2 + 8 * 2; j += 2) {
           const answer = row[j] || '';
           const percentage = Number(row[j + 1]) || 0;
           options.push({ answer, percentage, revealed: false });
         }
-        while (options.length < 5) options.push({ answer: '', percentage: 0, revealed: false });
+        while (options.length < 8) options.push({ answer: '', percentage: 0, revealed: false });
         questions.push({ text: row[1], options, round: 'Rapid Fire' });
         continue;
       }
@@ -567,6 +593,105 @@ export class GameService {
     this.syncState();
   }
 
+  // Reset only Rapid Fire answers and loaded flags (admin start-over)
+  resetRapidRound() {
+    // Remove previously awarded rapid points from team totals
+    try {
+      if (this.rapidAppliedTeamA > 0) {
+        const aIdx = this.teams.findIndex(t => t.name === 'Team A');
+        if (aIdx !== -1) {
+          this.teams[aIdx].score -= this.rapidAppliedTeamA;
+          if (this.teams[aIdx].score < 0) this.teams[aIdx].score = 0;
+        }
+      }
+      if (this.rapidAppliedTeamB > 0) {
+        const bIdx = this.teams.findIndex(t => t.name === 'Team B');
+        if (bIdx !== -1) {
+          this.teams[bIdx].score -= this.rapidAppliedTeamB;
+          if (this.teams[bIdx].score < 0) this.teams[bIdx].score = 0;
+        }
+      }
+    } catch {}
+    this.rapidAnswers = {
+      participant1: Array(10).fill(0).map(() => ({ answer: '', percentage: 0 })),
+      participant2: Array(10).fill(0).map(() => ({ answer: '', percentage: 0 }))
+    };
+    this.rapidActualAnswers = Array(10).fill(0).map(() => ({ answer: '', percentage: 0 }));
+    this.rapidPercentageLoaded = { participant1: Array(10).fill(false), participant2: Array(10).fill(false) };
+    this.rapidLoaded = false;
+    this.rapidAppliedTeamA = 0;
+    this.rapidAppliedTeamB = 0;
+    this.rapidWinnerTeam = null;
+    this.syncState();
+  }
+
+  // Set the participating team for rapid fire and reset their rapid score
+  setRapidTeam(teamName: string) {
+    this.selectedTeam = teamName;
+    const idx = this.teams.findIndex(t => t.name === teamName);
+    if (idx !== -1) {
+      // Subtract any previously applied rapid points for that team
+      if (teamName === 'Team A' && this.rapidAppliedTeamA > 0) {
+        this.teams[idx].score -= this.rapidAppliedTeamA;
+        if (this.teams[idx].score < 0) this.teams[idx].score = 0;
+        this.rapidAppliedTeamA = 0;
+      }
+      if (teamName === 'Team B' && this.rapidAppliedTeamB > 0) {
+        this.teams[idx].score -= this.rapidAppliedTeamB;
+        if (this.teams[idx].score < 0) this.teams[idx].score = 0;
+        this.rapidAppliedTeamB = 0;
+      }
+    }
+    // Reset both teams' scores when selecting rapid team
+    this.teams.forEach(t => t.score = 0);
+    this.syncRapidTeamScore();
+    this.rapidTargetPoints = 200;
+    this.rapidWinnerTeam = null;
+    this.syncState();
+  }
+
+  // Award combined rapid score for selected team by delta since last award
+  awardRapidScoreForSelectedTeam() {
+    const teamName = this.selectedTeam || 'Team A';
+    const total = this.totalRapidScore; // combined P1+P2
+    const applied = teamName === 'Team A' ? this.rapidAppliedTeamA : this.rapidAppliedTeamB;
+    const delta = Math.max(0, total - applied);
+    if (delta > 0) {
+      this.addScoreByName(teamName, delta);
+      if (teamName === 'Team A') this.rapidAppliedTeamA = total; else this.rapidAppliedTeamB = total;
+      this.syncState();
+    }
+  }
+
+  // Evaluate rapid target and set winner when goal reached
+  private evaluateRapidWin() {
+    if (!this.isRapidRound) return;
+    if (this.rapidWinnerTeam) return; // already decided
+    // Keep selected team's score synced with rapid total
+    this.syncRapidTeamScore();
+    const total = this.totalRapidScore;
+    if (total >= (this.rapidTargetPoints || 200)) {
+      this.rapidWinnerTeam = this.selectedTeam || 'Team A';
+      this.syncState();
+      try { (this as any)._onRapidWin?.(this.rapidWinnerTeam); } catch {}
+    }
+  }
+
+  private syncRapidTeamScore() {
+    if (!this.isRapidRound) return;
+    const total = this.totalRapidScore;
+    const idx = this.teams.findIndex(t => t.name === this.selectedTeam);
+    if (idx !== -1) {
+      this.teams[idx].score = total;
+    }
+    // Set non-selected team to 0 during rapid
+    for (let i = 0; i < this.teams.length; i++) {
+      if (this.teams[i].name !== this.selectedTeam) {
+        this.teams[i].score = 0;
+      }
+    }
+  }
+
   incrementWrong() {
     if (this.wrongCount < 3) {
       this.wrongCount++;
@@ -607,6 +732,9 @@ export class GameService {
         if (msg.event === 'fastMoney') {
           try { console.info('[ws] event fastMoney'); } catch {}
           try { (this as any)._onFastMoney?.(); } catch {}
+        } else if (msg.event === 'wrongCue') {
+          try { console.info('[ws] event wrongCue'); } catch {}
+          try { (this as any)._onShowWrong?.(); } catch {}
         }
         break;
       // handle other message types if needed
@@ -646,6 +774,15 @@ export class GameService {
     try {
       if (this.isAdmin && this.ws && this.ws.readyState === 1) {
         this.ws.send(JSON.stringify({ type: 'event', event: 'fastMoney' }));
+      }
+    } catch {}
+  }
+
+  // Broadcast a cue to play the wrong-answer sound on presentation (no overlay)
+  playWrongCue() {
+    try {
+      if (this.isAdmin && this.ws && this.ws.readyState === 1) {
+        this.ws.send(JSON.stringify({ type: 'event', event: 'wrongCue' }));
       }
     } catch {}
   }

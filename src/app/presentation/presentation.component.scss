@@ -39,7 +39,7 @@
   display: flex;
   align-items: center;
   font-size: 2.8vmin;
-  font-weight: 700;
+  font-weight: 100;
   color: #fff;
   text-shadow: 0 2px 8px #222, 0 0 2px #ffe066;
   z-index: 2;
@@ -93,6 +93,7 @@
   gap: 0.2em;
 }
 .feud-team-wrong-x { font-size: 2.0vmin; color: #FF4136; font-weight: 800; letter-spacing: 0.2vmin; }
+.feud-team-target { font-size: 2.0vmin; color: #ffd84d; font-weight: 800; letter-spacing: 0.1vmin; text-shadow: 0 0 2px #0a1a3a, 0 2px 6px rgba(0,0,0,.4); }
 .feud-timer-panel {
   font-size: 7.4vmin;
   font-weight: 800;
@@ -266,6 +267,15 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
 .rapid-board.two-columns{ justify-content:space-between; }
 .rapid-column{ flex:1; display:grid; grid-auto-rows: 5.6vmin; row-gap:.7vmin; }
 .rapid-column .slot{ height: 5.6vmin; }
+.rapid-column .slot::before{ inset: .3vmin; }
+.rapid-column .slot::after{ inset: .8vmin; }
+.rapid-column .slot-content{ inset: .8vmin; padding: 0.2vmin .4vmin; gap: .4vmin; align-items: center; justify-content: space-between; min-height: unset; }
+.rapid-board .rapid-column .slot-content { align-items: center; justify-content: space-between; padding: 0.15vmin 0.4vmin; gap: 0.3vmin; min-height: unset; }
+.rapid-board .rapid-column .slot-content .slot-answer,
+.rapid-board .rapid-column .slot-content .slot-percentage { line-height: 1; padding-block: 0; }
+.rapid-board .rapid-column .slot-answer { display: block; }
+.rapid-column .slot-answer{ font-size: 1.6vmin; font-weight: 100; white-space: normal; overflow-wrap: anywhere; align-self: center; }
+.rapid-column .slot-percentage{ font-size: 1.7vmin; flex: 0 0 var(--pill-width-rapid); width: var(--pill-width-rapid); min-width: var(--pill-width-rapid); padding: 0; border-width: .18vmin; display:flex; align-items:center; justify-content:center; align-self: center; }
 .slot-content.placeholder{ min-height: 1px; }
 .slot{
   height:9.2vmin;
@@ -292,10 +302,10 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
   z-index: 1; /* under content */
 }
 /* Flex container for revealed content */
-.slot-content { position: absolute; inset: 1.35vmin; display: flex; align-items: center; justify-content: space-between; padding: 0.3vmin 1.2vmin; gap: 1.2vmin; z-index: 6; }
-/* Increase vertical room for text spans to avoid clipping */
+.slot-content { position: absolute; inset: 1.35vmin; display: flex; align-items: center; justify-content: space-between; padding: 0.15vmin 0.8vmin; gap: 0.6vmin; z-index: 6; min-height: 50px; }
+/* Keep spans readable but tighten vertical padding */
 .slot-content .slot-answer,
-.slot-content .slot-percentage { line-height: 1.2; padding-block: 0.2vmin; }
+.slot-content .slot-percentage { line-height: 1.2; padding-block: 0.1vmin; }
 .slot-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 720ms cubic-bezier(.2,.7,.2,1); z-index: 5; }
 .slot.revealed .slot-inner { transform: rotateY(180deg); }
 .slot-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; z-index: 5; }
@@ -309,7 +319,7 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
   pointer-events:none;
 }
 /* Percentage pill inside slot */
-.slot-answer { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot-answer { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
 .slot-percentage { position: relative; flex: 0 0 var(--pill-width-normal); width: var(--pill-width-normal); min-width: var(--pill-width-normal); padding: 0; font-size: 2.6vmin; font-weight: 800; color: #fff; background: #1d4aa8; border: .25vmin solid #fff; border-radius: 0; box-shadow: 0 2px 8px rgba(0,0,0,.4); text-align: center; z-index: 2; display:flex; align-items:center; justify-content:center; }
 
 /* Wrong answer overlay */
@@ -416,3 +426,25 @@ html,body{height:100%;margin:0;background:#07122b;font-family:Segoe UI,Roboto,sy
   cursor: pointer;
 }
 .audio-nudge:hover { filter: brightness(1.06); }
+
+/* Rapid winner overlay */
+.winner-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(6,12,28,0.72);
+  backdrop-filter: blur(2px);
+  z-index: 2500;
+}
+.winner-box {
+  padding: 1.2rem 1.8rem;
+  background: linear-gradient(180deg, #ffd84d, #ffb100);
+  border: 4px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+  text-align: center;
+  color: #0a1a3a;
+}
+.winner-title { font-size: 2rem; font-weight: 900; margin-bottom: 0.3rem; }
+.winner-team { font-size: 2.2rem; font-weight: 800; }
